@@ -86,10 +86,12 @@
     const chatInput = document.querySelector('#chat-widget-input input');
     const chatBody = document.getElementById('chat-widget-body');
 
+    // Toggle chat UI
     chatButton.addEventListener('click', () => {
       chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
     });
 
+    // Handle sending messages
     document.querySelector('#chat-widget-input button').addEventListener('click', () => {
       const message = chatInput.value.trim();
       if (message) {
