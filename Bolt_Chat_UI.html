@@ -242,12 +242,12 @@
 </html> -->
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Widget</title>
+    <title>Simple Chat UI</title>
     <style>
         * {
             margin: 0;
@@ -256,76 +256,63 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .chat-widget {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 20px;
+            right: 20px;
             z-index: 1000;
         }
 
-        .chat-button {
-            width: 56px;
-            height: 56px;
+        .chat-icon {
+            background: #2563eb;
+            color: white;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background-color: #1EAEDB;
-            border: none;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: background-color 0.3s;
         }
 
-        .chat-button:hover {
-            background-color: #33C3F0;
+        .chat-icon:hover {
+            background: #1d4ed8;
         }
 
-        .chat-button svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-        }
-
-        .chat-window {
+        .chat-container {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 320px;
+            bottom: 100px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(120%);
-            opacity: 0;
-            transition: all 0.3s ease-in-out;
-            pointer-events: none;
-        }
-
-        .chat-window.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: all;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .chat-header {
-            padding: 16px;
-            background: #1EAEDB;
+            background: #2563eb;
             color: white;
-            border-radius: 12px 12px 0 0;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .chat-header h3 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
         }
 
-        .close-button {
+        .close-btn {
             background: none;
             border: none;
             color: white;
@@ -333,117 +320,165 @@
             padding: 4px;
         }
 
-        .chat-messages {
-            height: 384px;
+        .messages {
+            flex: 1;
             padding: 16px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .message {
-            background: #F1F1F1;
+            max-width: 80%;
             padding: 12px;
             border-radius: 12px;
-            margin-bottom: 16px;
-            max-width: 80%;
+            margin-bottom: 8px;
         }
 
-        .chat-input {
+        .bot-message {
+            background: #f3f4f6;
+            color: #1f2937;
+            align-self: flex-start;
+        }
+
+        .user-message {
+            background: #2563eb;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .input-area {
             padding: 16px;
-            border-top: 1px solid #F1F1F1;
+            border-top: 1px solid #e5e7eb;
             display: flex;
             gap: 8px;
         }
 
-        .chat-input input {
+        .message-input {
             flex: 1;
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .message-input:focus {
             outline: none;
+            border-color: #2563eb;
+            ring: 2px solid #2563eb;
         }
 
-        .chat-input input:focus {
-            border-color: #1EAEDB;
-        }
-
-        .chat-input button {
-            padding: 8px 16px;
-            background: #1EAEDB;
+        .send-btn {
+            background: #2563eb;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: background-color 0.3s;
         }
 
-        .chat-input button:hover {
-            background: #33C3F0;
+        .send-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .show {
+            display: flex;
         }
     </style>
 </head>
 <body>
     <div class="chat-widget">
-        <button class="chat-button" id="chatButton">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="chat-icon" id="chatIcon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-        </button>
+        </div>
 
-        <div class="chat-window" id="chatWindow">
+        <div class="chat-container" id="chatContainer">
             <div class="chat-header">
-                <h3>Chat with us</h3>
-                <button class="close-button" id="closeButton">✕</button>
+                <h3>Chat Support</h3>
+                <button class="close-btn" id="closeChat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <div class="chat-messages">
-                <div class="message">
-                    <p>Hello! How can we help you today?</p>
+
+            <div class="messages" id="messages">
+                <div class="message bot-message">
+                    Hello! How can I help you today?
                 </div>
             </div>
-            <div class="chat-input">
-                <input type="text" placeholder="Type your message..." id="messageInput">
-                <button id="sendButton">Send</button>
+
+            <div class="input-area">
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type your message..."
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="sendMessage">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        const chatButton = document.getElementById('chatButton');
-        const chatWindow = document.getElementById('chatWindow');
-        const closeButton = document.getElementById('closeButton');
+        const chatIcon = document.getElementById('chatIcon');
+        const chatContainer = document.getElementById('chatContainer');
+        const closeChat = document.getElementById('closeChat');
         const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
+        const sendMessage = document.getElementById('sendMessage');
+        const messagesContainer = document.getElementById('messages');
 
-        function toggleChat() {
-            chatWindow.classList.toggle('open');
-            if (chatWindow.classList.contains('open')) {
-                chatButton.style.display = 'none';
-            } else {
-                chatButton.style.display = 'flex';
-            }
+        chatIcon.addEventListener('click', () => {
+            chatContainer.classList.add('show');
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatContainer.classList.remove('show');
+        });
+
+        function addMessage(text, isBot = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isBot ? 'bot-message' : 'user-message'}`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        chatButton.addEventListener('click', toggleChat);
-        closeButton.addEventListener('click', toggleChat);
-
-        function sendMessage() {
+        function handleSend() {
             const message = messageInput.value.trim();
             if (message) {
-                const messagesContainer = document.querySelector('.chat-messages');
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message';
-                messageElement.style.marginLeft = 'auto';
-                messageElement.style.background = '#D3E4FD';
-                messageElement.innerHTML = `<p>${message}</p>`;
-                messagesContainer.appendChild(messageElement);
+                addMessage(message, false);
                 messageInput.value = '';
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Simulate bot response
+                setTimeout(() => {
+                    addMessage("Thanks for your message! Our team will get back to you soon.", true);
+                }, 1000);
             }
         }
 
-        sendButton.addEventListener('click', sendMessage);
+        sendMessage.addEventListener('click', handleSend);
+
         messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
             }
         });
     </script>
